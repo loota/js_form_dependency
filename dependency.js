@@ -62,8 +62,7 @@ var Dependency = new Class({
     });
     this.setMasters(wrappedMasters);
     var parentFunction = this;
-    masters.each(function (currentMaster) {
-      currentMaster = parentFunction._getWrappedElement(currentMaster);
+    this.getMasters().each(function (currentMaster) {
       currentMaster.getField().addEvent('keyup', function() {
         if (!slave.length) {
           slaves = [slave];
@@ -129,20 +128,8 @@ var CheckboxInput = new Class({
 });
 
 
-var text = new TextInput();
-text.setField($('foo'));
-
-var slave = new TextInput();
-slave.setField($('slave'));
-
-var slaveCheckbox = new CheckboxInput();
-slaveCheckbox.setField($('slaveCheckbox'));
-
-var slaveCheckbox2 = new CheckboxInput();
-slaveCheckbox2.setField($('slaveCheckbox2'));
-
-//var dep = new Dependency();
-//dep.createDependency(text, slave, 'wipe');
+var dep = new Dependency();
+dep.createDependency($('foo'), $('slave'), 'wipe');
 //dep.createDependency(text, slave);
 
 //var depTextToCheckbox = new Dependency();
