@@ -1,26 +1,92 @@
 var Dependency = new Class({
-  setDependent: function(dependent) {
-    this._dependent = dependent;
+  setMasters: function(masters) {
+    this._masters = masters;
   },
-  setMaster: function(master) {
-    this._master = master;
+  getMasters: function() {
+    return this._masters;
+  },
+  setEffect: function(effect) {
+    this._effect = effect;
+  },
+  getEffect: function() {
+    return this._effect;
+  },
+  _getWrappedElement: function(element) {
+    if (element.type === 'text') {
+      var wrappedElement = new TextInput();
+      wrappedElement.setField(element);
+    }
+    if (element.type === 'checkbox') {
+      var wrappedElement = new CheckboxInput();
+      wrappedElement.setField(element);
+    }
+    return wrappedElement;
+  },
+  _getEnhancedSlaves: function(slaves) {
+    var wrappedSlaves = [];
+    var parentFunction = this;
+    slaves.each(function (decoratedSlave) {
+      wrappedSlave = parentFunction._getWrappedElement(decoratedSlave);
+      wrappedSlaves.push(wrappedSlave);
+    });
+    return wrappedSlaves;
+  },
+  affectSlaves: function(slaves) {
+    var parentFunction = this;
+    slaves.each(function (currentSlave) {
+      if (parentFunction.getEffect() === 'wipe') {
+          currentSlave.wipe();
+      } else {
+        currentSlave.disable();
+      }
+    });
+  },
+  unaffectSlaves: function(wrappedSlaves) {
+    wrappedSlaves.each(function (currentSlave) {
+      currentSlave.enable();
+    });
   },
   createDependency: function(master, slave, effect) {
-    master.getField().addEvent('keyup', function() {
-      if (!slave.lenght) {
-        slaves = [slave];
-      }
-      if (master.hasValue()) {
-        if (effect === 'wipe') {
-          slaves.each(function (currentSlave) {
-            currentSlave.wipe();
-          });
+    this.setEffect(effect);
+    parentFunction = this;
+    if (!master.length) {
+      masters = [master];
+    } else {
+      masters = master;
+    }
+
+    var wrappedMasters = [];
+    masters.each(function (currentMaster) {
+      var wrappedMaster = parentFunction._getWrappedElement(currentMaster);
+      wrappedMasters.push(wrappedMaster);
+    });
+    this.setMasters(wrappedMasters);
+    var parentFunction = this;
+    masters.each(function (currentMaster) {
+      currentMaster = parentFunction._getWrappedElement(currentMaster);
+      currentMaster.getField().addEvent('keyup', function() {
+        if (!slave.length) {
+          slaves = [slave];
         } else {
-          slave.disable();
+          slaves = slave;
         }
-      } else {
-        slave.enable();
-      }
+        wrappedSlaves = parentFunction._getEnhancedSlaves(slaves);
+        var masterHasValue = false;
+        if (currentMaster.hasValue()) {
+          masterHasValue = true;
+          parentFunction.affectSlaves(wrappedSlaves);
+        } else {
+          parentFunction.getMasters().each(function (otherMaster) {
+            if (otherMaster.hasValue()) {
+              masterHasValue = true;
+              parentFunction.affectSlaves(wrappedSlaves);
+            }
+          });
+        }
+        if (!masterHasValue) {
+          parentFunction.unaffectSlaves(wrappedSlaves);
+        }
+      });
     });
   }
 });
@@ -34,12 +100,8 @@ var HtmlWrapper = new Class({
   }
 });
 
-var Dependent = new Class({
-  Extends: HtmlWrapper
-});
-
 var TextInput = new Class({
-  Extends: Dependent,
+  Extends: HtmlWrapper,
   enable: function() {
     this._field.disabled = false;
   },
@@ -49,6 +111,12 @@ var TextInput = new Class({
   wipe: function() {
     this.disable();
     this._field.value = "";
+  },
+  hasValue: function() {
+    if (this._field.value) {
+      return true;
+    }
+    return false;
   }
 });
 
@@ -60,17 +128,8 @@ var CheckboxInput = new Class({
   }
 });
 
-var TextMaster = new Class({
-  Extends: HtmlWrapper,
-  hasValue: function() {
-    if (this._field.value) {
-      return true;
-    }
-    return false;
-  }
-});
 
-var text = new TextMaster();
+var text = new TextInput();
 text.setField($('foo'));
 
 var slave = new TextInput();
@@ -82,12 +141,18 @@ slaveCheckbox.setField($('slaveCheckbox'));
 var slaveCheckbox2 = new CheckboxInput();
 slaveCheckbox2.setField($('slaveCheckbox2'));
 
-var dep = new Dependency();
+//var dep = new Dependency();
 //dep.createDependency(text, slave, 'wipe');
-dep.createDependency(text, slave);
+//dep.createDependency(text, slave);
+
+//var depTextToCheckbox = new Dependency();
+//depTextToCheckbox.createDependency(text, slaveCheckbox, 'wipe');
+
+//var depTextToCheckbox2 = new Dependency();
+ //depTextToCheckbox2.createDependency(text, slaveCheckbox2);
+
+//var depTextToCheckbox = new Dependency();
+//depTextToCheckbox.createDependency(text, document.getElements('.checkbox_class'), 'wipe');
 
 var depTextToCheckbox = new Dependency();
-depTextToCheckbox.createDependency(text, slaveCheckbox, 'wipe');
-
-var depTextToCheckbox2 = new Dependency();
- depTextToCheckbox2.createDependency(text, slaveCheckbox2);
+depTextToCheckbox.createDependency(document.getElements('.text_class'), document.getElements('.checkbox_class'), 'wipe');
