@@ -36,14 +36,23 @@ var Dependency = new Class({
     slaves.each(function (currentSlave) {
       if (parentFunction.getEffect() === 'wipe') {
           currentSlave.wipe();
+      } else if (parentFunction.getEffect() === 'hide') {
+        currentSlave.hide();
       } else {
         currentSlave.disable();
       }
     });
   },
-  unaffectSlaves: function(wrappedSlaves) {
+    unaffectSlaves: function(wrappedSlaves) {
+    parentFunction = this;
     wrappedSlaves.each(function (currentSlave) {
-      currentSlave.enable();
+      if (parentFunction.getEffect() === 'wipe') {
+        currentSlave.wipe();
+      } else if (parentFunction.getEffect() === 'hide') {
+        currentSlave.show();
+      } else {
+        currentSlave.enable();
+      }
     });
   },
   createDependency: function(master, slave, effect) {
@@ -96,6 +105,12 @@ var HtmlWrapper = new Class({
   },
   getField: function() {
     return this._field;
+  },
+  hide: function() {
+    this._field.setStyle('display', 'none');
+  },
+  show: function() {
+    this._field.setStyle('display', 'block');
   }
 });
 
@@ -129,7 +144,7 @@ var CheckboxInput = new Class({
 
 
 var dep = new Dependency();
-dep.createDependency($('foo'), $('slave'), 'wipe');
+dep.createDependency($('foo'), $('slave'));
 //dep.createDependency(text, slave);
 
 //var depTextToCheckbox = new Dependency();
@@ -142,4 +157,4 @@ dep.createDependency($('foo'), $('slave'), 'wipe');
 //depTextToCheckbox.createDependency(text, document.getElements('.checkbox_class'), 'wipe');
 
 var depTextToCheckbox = new Dependency();
-depTextToCheckbox.createDependency(document.getElements('.text_class'), document.getElements('.checkbox_class'), 'wipe');
+depTextToCheckbox.createDependency(document.getElements('.text_class'), document.getElements('.checkbox_class'), 'hide');
