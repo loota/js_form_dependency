@@ -65,7 +65,7 @@ var DependencyManager = new Class({
   },
   // @param array|string|mootools element  master  the element or elements of which slave or slaves depend on
   // @param array|string|mootools element  slave  the element or elements which depend on the master or masters
-  createDependency: function(master, slave, effect) {
+  createDependency: function(master, slave, effect, triggerValue) {
 
     // @param string  effect  the effect which happens to the slave element or elements. One of hide, disable, enable, wipe
     this.setEffect(effect);
@@ -92,8 +92,14 @@ var DependencyManager = new Class({
         }
         wrappedSlaves = parentFunction._getEnhancedSlaves(slaves);
         var masterHasValue = false;
-        if (currentMaster.hasValue()) {
-          masterHasValue = true;
+        if (!triggerValue) {
+          if (currentMaster.hasValue()) {
+            masterHasValue = true;
+          } else if (triggerValue === currentMaster.getValue()) {
+            masterHasValue = true;
+          }
+        }
+        if (masterHasValue) {
           parentFunction.affectSlaves(wrappedSlaves);
         } else {
           parentFunction.getMasters().each(function (otherMaster) {
@@ -143,6 +149,9 @@ var TextInput = new Class({
       return true;
     }
     return false;
+  },
+  getValue: function() {
+    return this._field.value;
   }
 });
 
@@ -162,5 +171,8 @@ var SelectInput = new Class({
   },
   hasValue: function() {
     return true;
+  },
+  getValue: function() {
+    return this._field.getSelected().get('value');
   }
 });
