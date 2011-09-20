@@ -45,6 +45,8 @@ var DependencyManager = new Class({
           currentSlave.wipe();
       } else if (parentFunction.getEffect() === 'hide') {
         currentSlave.hide();
+      } else if (parentFunction.getEffect() === 'enable') {
+        currentSlave.enable();
       } else {
         currentSlave.disable();
       }
@@ -58,6 +60,8 @@ var DependencyManager = new Class({
         currentSlave.enable();
       } else if (parentFunction.getEffect() === 'hide') {
         currentSlave.show();
+      } else if (parentFunction.getEffect() === 'enable') {
+        currentSlave.disable();
       } else {
         currentSlave.enable();
       }
@@ -65,9 +69,11 @@ var DependencyManager = new Class({
   },
   // @param array|string|mootools element  master  the element or elements of which slave or slaves depend on
   // @param array|string|mootools element  slave  the element or elements which depend on the master or masters
+  // @param string  effect  the effect which happens to the slave element or elements. One of hide, disable, enable, wipe
+  // @param string  triggerValue  the value that the master or masters must to have in
+  // order to affect the slave or slaves
   createDependency: function(master, slave, effect, triggerValue) {
 
-    // @param string  effect  the effect which happens to the slave element or elements. One of hide, disable, enable, wipe
     this.setEffect(effect);
     parentFunction = this;
     if (typeOf(master) === 'array') {
@@ -85,35 +91,52 @@ var DependencyManager = new Class({
     var parentFunction = this;
     this.getMasters().each(function (currentMaster) {
       currentMaster.getField().addEvent('keyup', function() {
-        if (typeOf(slave) === 'array') {
-          slaves = slave;
-        } else {
-          slaves = [slave];
-        }
-        wrappedSlaves = parentFunction._getEnhancedSlaves(slaves);
-        var masterHasValue = false;
-        if (!triggerValue) {
-          if (currentMaster.hasValue()) {
-            masterHasValue = true;
-          } else if (triggerValue === currentMaster.getValue()) {
+          parentFunction.checkEffectToSlaves(currentMaster, slave, triggerValue, parentFunction);
+      });
+      currentMaster.getField().addEvent('change', function() {
+          parentFunction.checkEffectToSlaves(currentMaster, slave, triggerValue, parentFunction);
+      });
+    });
+  },
+  
+  // @param array|string|mootools element  master  the element or elements of which slave or slaves depend on
+  // @param array|string|mootools element  slave  the element or elements which depend on the master or masters
+  // @param string  triggerValue  the value that the master or masters must to have in
+  // order to affect the slave or slaves
+  checkEffectToSlaves: function (currentMaster, slave, triggerValue, parentFunction){
+    if (typeOf(slave) === 'array') {
+      slaves = slave;
+    } else {
+      slaves = [slave];
+    }
+    wrappedSlaves = this._getEnhancedSlaves(slaves);
+    var masterHasValue = false;
+    if (triggerValue === currentMaster.getValue()) {
+      masterHasValue = true;
+    } else if (!triggerValue) {
+      if (currentMaster.hasValue()) {
+        masterHasValue = true;
+      }
+    }
+    if (masterHasValue) {
+      this.affectSlaves(wrappedSlaves);
+    } else {
+      this.getMasters().each(function (otherMaster) {
+        if (triggerValue === otherMaster.getValue()) {
+          masterHasValue = true;
+        } else if (!triggerValue) {
+          if (otherMaster.hasValue()) {
             masterHasValue = true;
           }
         }
         if (masterHasValue) {
-          parentFunction.affectSlaves(wrappedSlaves);
-        } else {
-          parentFunction.getMasters().each(function (otherMaster) {
-            if (otherMaster.hasValue()) {
-              masterHasValue = true;
-              parentFunction.affectSlaves(wrappedSlaves);
-            }
-          });
-        }
-        if (!masterHasValue) {
-          parentFunction.unaffectSlaves(wrappedSlaves);
+          this.affectSlaves(wrappedSlaves);
         }
       });
-    });
+    }
+    if (triggerValue && triggerValue !== currentMaster.getValue() || (!triggerValue && !masterHasValue)) {
+      this.unaffectSlaves(wrappedSlaves);
+    }
   }
 });
 
@@ -173,6 +196,6 @@ var SelectInput = new Class({
     return true;
   },
   getValue: function() {
-    return this._field.getSelected().get('value');
+    return this._field.getSelected().get('value')[0];
   }
 });
