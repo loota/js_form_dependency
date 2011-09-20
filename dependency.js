@@ -76,7 +76,7 @@ var DependencyManager = new Class({
 
     this.setEffect(effect);
     parentFunction = this;
-    if (typeOf(master) === 'array') {
+    if (typeOf(master) === 'array' || typeOf(master) === 'elements') {
       masters = master;
     } else {
       masters = [master];
@@ -104,37 +104,37 @@ var DependencyManager = new Class({
   // @param string  triggerValue  the value that the master or masters must to have in
   // order to affect the slave or slaves
   checkEffectToSlaves: function (currentMaster, slave, triggerValue, parentFunction){
-    if (typeOf(slave) === 'array') {
+    if (typeOf(slave) === 'array' || typeOf(slave) === 'elements') {
       slaves = slave;
     } else {
       slaves = [slave];
     }
     wrappedSlaves = this._getEnhancedSlaves(slaves);
-    var masterHasValue = false;
+    var effectShouldHappen = false;
     if (triggerValue === currentMaster.getValue()) {
-      masterHasValue = true;
+      effectShouldHappen = true;
     } else if (!triggerValue) {
       if (currentMaster.hasValue()) {
-        masterHasValue = true;
+        effectShouldHappen = true;
       }
     }
-    if (masterHasValue) {
+    if (effectShouldHappen) {
       this.affectSlaves(wrappedSlaves);
     } else {
       this.getMasters().each(function (otherMaster) {
         if (triggerValue === otherMaster.getValue()) {
-          masterHasValue = true;
+          effectShouldHappen = true;
         } else if (!triggerValue) {
           if (otherMaster.hasValue()) {
-            masterHasValue = true;
+            effectShouldHappen = true;
           }
         }
-        if (masterHasValue) {
+        if (effectShouldHappen) {
           this.affectSlaves(wrappedSlaves);
         }
       });
     }
-    if (triggerValue && triggerValue !== currentMaster.getValue() || (!triggerValue && !masterHasValue)) {
+    if (triggerValue && triggerValue !== currentMaster.getValue() || (!triggerValue && !effectShouldHappen)) {
       this.unaffectSlaves(wrappedSlaves);
     }
   }
