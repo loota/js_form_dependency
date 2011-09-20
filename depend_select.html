@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <script src="mootools-core-1.3-full-nocompat.js">
+        </script>
+        <script src="dependency.js">
+        </script>
+    </head>
+    <body>
+        firstText
+        <input id="firstText" type="text" />
+        firstSelect
+        <select id="firstSelect">
+            <option value="1">foo</option>
+            <option value="2" selected="selected">bar</option>
+            <option value="3">baz</option>
+        </select>
+        <script>
+            // First text input, when given value, will wipe the select input
+            var depTextToSelect = new DependencyManager();
+            depTextToSelect.createDependency(firstText, firstSelect, 'wipe');
+        </script>
+    </body>
+</html>

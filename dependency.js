@@ -1,4 +1,4 @@
-var Dependency = new Class({
+var DependencyManager = new Class({
   setMasters: function(masters) {
     this._masters = masters;
   },
@@ -11,6 +11,7 @@ var Dependency = new Class({
   getEffect: function() {
     return this._effect;
   },
+  // @param DOM element element
   _getWrappedElement: function(element) {
     if (element.type === 'text') {
       var wrappedElement = new TextInput();
@@ -20,8 +21,13 @@ var Dependency = new Class({
       var wrappedElement = new CheckboxInput();
       wrappedElement.setField(element);
     }
+    if (element.type === 'select-one') {
+      var wrappedElement = new SelectInput();
+      wrappedElement.setField(element);
+    }
     return wrappedElement;
   },
+  // @param array slaves of DOM elements
   _getEnhancedSlaves: function(slaves) {
     var wrappedSlaves = [];
     var parentFunction = this;
@@ -31,6 +37,7 @@ var Dependency = new Class({
     });
     return wrappedSlaves;
   },
+  // @param array slaves of enhanced slave elements
   affectSlaves: function(slaves) {
     var parentFunction = this;
     slaves.each(function (currentSlave) {
@@ -43,11 +50,12 @@ var Dependency = new Class({
       }
     });
   },
-    unaffectSlaves: function(wrappedSlaves) {
+  // @param array slaves of enhanced slave elements
+  unaffectSlaves: function(wrappedSlaves) {
     parentFunction = this;
     wrappedSlaves.each(function (currentSlave) {
       if (parentFunction.getEffect() === 'wipe') {
-        currentSlave.wipe();
+        currentSlave.enable();
       } else if (parentFunction.getEffect() === 'hide') {
         currentSlave.show();
       } else {
@@ -55,13 +63,17 @@ var Dependency = new Class({
       }
     });
   },
+  // @param array|string|mootools element  master  the element or elements of which slave or slaves depend on
+  // @param array|string|mootools element  slave  the element or elements which depend on the master or masters
   createDependency: function(master, slave, effect) {
+
+    // @param string  effect  the effect which happens to the slave element or elements. One of hide, disable, enable, wipe
     this.setEffect(effect);
     parentFunction = this;
-    if (!master.length) {
-      masters = [master];
-    } else {
+    if (typeOf(master) === 'array') {
       masters = master;
+    } else {
+      masters = [master];
     }
 
     var wrappedMasters = [];
@@ -73,10 +85,10 @@ var Dependency = new Class({
     var parentFunction = this;
     this.getMasters().each(function (currentMaster) {
       currentMaster.getField().addEvent('keyup', function() {
-        if (!slave.length) {
-          slaves = [slave];
-        } else {
+        if (typeOf(slave) === 'array') {
           slaves = slave;
+        } else {
+          slaves = [slave];
         }
         wrappedSlaves = parentFunction._getEnhancedSlaves(slaves);
         var masterHasValue = false;
@@ -110,7 +122,7 @@ var HtmlWrapper = new Class({
     this._field.setStyle('display', 'none');
   },
   show: function() {
-    this._field.setStyle('display', 'block');
+    this._field.setStyle('display', 'inline');
   }
 });
 
@@ -142,19 +154,13 @@ var CheckboxInput = new Class({
   }
 });
 
-
-var dep = new Dependency();
-dep.createDependency($('foo'), $('slave'));
-//dep.createDependency(text, slave);
-
-//var depTextToCheckbox = new Dependency();
-//depTextToCheckbox.createDependency(text, slaveCheckbox, 'wipe');
-
-//var depTextToCheckbox2 = new Dependency();
- //depTextToCheckbox2.createDependency(text, slaveCheckbox2);
-
-//var depTextToCheckbox = new Dependency();
-//depTextToCheckbox.createDependency(text, document.getElements('.checkbox_class'), 'wipe');
-
-var depTextToCheckbox = new Dependency();
-depTextToCheckbox.createDependency(document.getElements('.text_class'), document.getElements('.checkbox_class'), 'hide');
+var SelectInput = new Class({
+  Extends: TextInput,
+  wipe: function() {
+    this.disable();
+    this._field.selectedIndex = 0;
+  },
+  hasValue: function() {
+    return true;
+  }
+});

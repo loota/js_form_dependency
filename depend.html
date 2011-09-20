@@ -2,15 +2,23 @@
     <head>
         <script src="mootools-core-1.3-full-nocompat.js">
         </script>
+        <script src="dependency.js">
+        </script>
     </head>
     <body>
-        <p>foo</p>
-        <input id="foo" type="text" class="text_class" />
-        <input id="foo2" type="text" class="text_class" />
-        <input id="slave" type="text" value="slave" />
-        <input class="checkbox_class" id="slaveCheckbox" type="checkbox" value="slave" />
-        <input class="checkbox_class" id="slaveCheckbox2" type="checkbox" value="slave2" />
-        <script src="dependency.js">
+        firstText<input id="firstText" type="text" class="text_class" />
+        secondText<input id="secondText" type="text" class="text_class" />
+        thirdText<input id="thirdText" type="text" value="thirdText" />
+        firstCB<input class="hide_class" id="firstCB" type="checkbox" value="firstCB" />
+        secondCB<input class="hide_class" id="secondCB" type="checkbox" value="secondCB" />
+        <script>
+            // First text input, when given value, will disable third text input.
+            var dep = new DependencyManager();
+            dep.createDependency($('firstText'), $('thirdText'));
+
+            // All inputs with class "text_class", given value, will hide all elements with the class "hide_class"
+            var depTextToCheckbox = new DependencyManager();
+            depTextToCheckbox.createDependency(document.getElements('.text_class'), document.getElements('.hide_class'), 'hide');
         </script>
     </body>
 </html>
