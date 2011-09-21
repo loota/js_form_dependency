@@ -1,3 +1,6 @@
+/**
+ * License: MIT-style license
+ */
 var DependencyManager = new Class({
   setMasters: function(masters) {
     this._masters = masters;
