@@ -15,15 +15,18 @@ var DependencyManager = new Class({
   _getWrappedElement: function(element) {
     if (element.type === 'text') {
       var wrappedElement = new TextInput();
-      wrappedElement.setField(element);
     }
     if (element.type === 'checkbox') {
       var wrappedElement = new CheckboxInput();
-      wrappedElement.setField(element);
     }
     if (element.type === 'select-one') {
       var wrappedElement = new SelectInput();
-      wrappedElement.setField(element);
+    }
+    if (element.type === 'radio') {
+      var wrappedElement = new SelectInput();
+    }
+    if (wrappedElement) {
+        wrappedElement.setField(element);
     }
     return wrappedElement;
   },
@@ -47,6 +50,8 @@ var DependencyManager = new Class({
         currentSlave.hide();
       } else if (parentFunction.getEffect() === 'enable') {
         currentSlave.enable();
+      } else if (typeOf(parentFunction.getEffect()) === 'object') {
+          parentFunction.getEffect()['affect'](currentSlave);
       } else {
         currentSlave.disable();
       }
@@ -62,6 +67,8 @@ var DependencyManager = new Class({
         currentSlave.show();
       } else if (parentFunction.getEffect() === 'enable') {
         currentSlave.disable();
+      } else if (typeOf(parentFunction.getEffect()) === 'object') {
+          parentFunction.getEffect()['unaffect'](currentSlave);
       } else {
         currentSlave.enable();
       }
@@ -69,11 +76,25 @@ var DependencyManager = new Class({
   },
   // @param array|string|mootools element  master  the element or elements of which slave or slaves depend on
   // @param array|string|mootools element  slave  the element or elements which depend on the master or masters
-  // @param string  effect  the effect which happens to the slave element or elements. One of hide, disable, enable, wipe
-  // @param string  triggerValue  the value that the master or masters must to have in
-  // order to affect the slave or slaves
+  // @param string|object  effect  the effect which happens to the slave element
+  // or elements. One of hide, disable, enable, wipe. If given an object, there
+  // must be two members: 'affect' and 'unaffect'.
+  // 'affect' must contain a function which is run when the
+  // master has the preferred value and should contain functionality for
+  // defining what happens to the slave. 
+  // The 'unaffect' is run when the master gains other than the preferred value
+  // and defines what happens to slaves in that case.
+  // @param string|function  triggerValue  the value that the master or masters must to have in
+  // order to affect the slave or slaves. If given a function, the function's
+  // return value must match the master's value in order for the slave to react.
   createDependency: function(master, slave, effect, triggerValue) {
 
+    if (typeOf(master) === 'string') {
+        master = $(master);
+    }
+    if (typeOf(slave) === 'string') {
+        slave = $(slave);
+    }
     this.setEffect(effect);
     parentFunction = this;
     if (typeOf(master) === 'array' || typeOf(master) === 'elements') {
@@ -101,13 +122,17 @@ var DependencyManager = new Class({
   
   // @param array|string|mootools element  master  the element or elements of which slave or slaves depend on
   // @param array|string|mootools element  slave  the element or elements which depend on the master or masters
-  // @param string  triggerValue  the value that the master or masters must to have in
-  // order to affect the slave or slaves
+  // @param string|function  triggerValue  the value that the master or masters must to have in
+  // order to affect the slave or slaves. @see createDependency
   checkEffectToSlaves: function (currentMaster, slave, triggerValue, parentFunction){
     if (typeOf(slave) === 'array' || typeOf(slave) === 'elements') {
       slaves = slave;
     } else {
       slaves = [slave];
+    }
+    if (typeOf(triggerValue) === 'function') {
+        var result = triggerValue(currentMaster);
+        triggerValue = result;
     }
     wrappedSlaves = this._getEnhancedSlaves(slaves);
     var effectShouldHappen = false;
@@ -197,5 +222,19 @@ var SelectInput = new Class({
   },
   getValue: function() {
     return this._field.getSelected().get('value')[0];
+  }
+});
+
+var RadioInput = new Class({
+  Extends: TextInput,
+  wipe: function() {
+    this.disable();
+    this._field.set('checked', false);
+  },
+  hasValue: function() {
+    return true;
+  },
+  getValue: function() {
+    return this._field.get('checked');
   }
 });

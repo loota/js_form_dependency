@@ -6,9 +6,9 @@
         </script>
     </head>
     <body>
-        firstText<input id="firstText" type="text" class="text_class" />
-        secondText<input id="secondText" type="text" class="text_class" />
-        thirdText<input id="thirdText" type="text" value="thirdText" />
+        Insert a value to disable the third text input, and to make both checkboxes disappear<input id="firstText" type="text" class="text_class" />
+        Type something to make both checkboxes disappear<input id="secondText" type="text" class="text_class" />
+        third<input id="thirdText" type="text" value="thirdText" />
         firstCB<input id="firstCB" type="checkbox" value="firstCB" class="hide_class" />
         secondCB<input id="secondCB" type="checkbox" value="secondCB" class="hide_class" />
         <script>
@@ -17,8 +17,8 @@
             dep.createDependency($('firstText'), $('thirdText'));
 
             // All inputs with class "text_class", given value, will hide all elements with the class "hide_class"
-            var depTextToCheckbox = new DependencyManager();
-            depTextToCheckbox.createDependency(document.getElements('.text_class'), document.getElements('.hide_class'), 'hide');
+            var depTextClassToHideClass = new DependencyManager();
+            depTextClassToHideClass.createDependency(document.getElements('.text_class'), document.getElements('.hide_class'), 'hide');
         </script>
     </body>
 </html>
