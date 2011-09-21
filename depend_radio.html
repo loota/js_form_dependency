@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <script src="mootools-core-1.3-full-nocompat.js">
+        </script>
+        <script src="dependency.js">
+        </script>
+    </head>
+    <body>
+        Trigger value defined here<input id="triggerText" type="text" />
+        Type the the contents of the previous input here to enable the second radio button.<input id="firstText" type="text" class="text_class" />
+        firstRadio<input id="firstRadio" name="radios" type="radio" value="firstRadio"/>
+        secondRadio<input id="secondRadio" name="radios" type="radio" value="secondRadio" />
+        <script>
+            // First text input, when given value corresponding to the total
+            // number of radio inputs in the document, will enable the second radio input.
+            var dep = new DependencyManager();
+            dep.createDependency('firstText', 'secondRadio', 'enable',
+                function() {
+                    return $('triggerText').get('value');
+                });
+        </script>
+    </body>
+</html>
