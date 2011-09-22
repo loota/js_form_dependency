@@ -88,8 +88,9 @@ var DependencyManager = new Class({
   // The 'unaffect' is run when the master gains other than the preferred value
   // and defines what happens to slaves in that case.
   // @param string|function  triggerValue  the value that the master or masters must to have in
-  // order to affect the slave or slaves. If given a function, the function's
-  // return value must match the master's value in order for the slave to react.
+  // order to affect the slave or slaves. If given a function, the function
+  // receives an object representing the master and the function's
+  // return value decides if the slave or slaves will be affected.
   createDependency: function(master, slave, effect, triggerValue) {
 
     if (typeOf(master) === 'string') {
@@ -125,8 +126,10 @@ var DependencyManager = new Class({
   
   // @param array|string|mootools element  master  the element or elements of which slave or slaves depend on
   // @param array|string|mootools element  slave  the element or elements which depend on the master or masters
-  // @param string|function  triggerValue  the value that the master or masters must to have in
-  // order to affect the slave or slaves. @see createDependency
+  // @param string|function  triggerValue  the value that the master or masters
+  // must have in order to affect the slave or slaves. If a function is given,
+  // it takes as a parameter the master object and returns boolean, true if the
+  // slave or slaves will be affected. @see createDependency
   checkEffectToSlaves: function (currentMaster, slave, triggerValue, parentFunction){
     if (typeOf(slave) === 'array' || typeOf(slave) === 'elements') {
       slaves = slave;
@@ -135,7 +138,10 @@ var DependencyManager = new Class({
     }
     if (typeOf(triggerValue) === 'function') {
         var result = triggerValue(currentMaster);
-        triggerValue = result;
+        if (result) {
+            this.affectSlaves(wrappedSlaves);
+            return;
+        }
     }
     wrappedSlaves = this._getEnhancedSlaves(slaves);
     var effectShouldHappen = false;
