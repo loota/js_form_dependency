@@ -15,8 +15,7 @@
         <input id="firstText" type="text" value="will disappear if bar selected" />
         <script>
             // First select, when given value "2", will wipe the first text input
-            var depTextToSelect = new DependencyManager();
-            depTextToSelect.createDependency(firstSelect, firstText, 'wipe', '2');
+            var depTextToSelect = new DependencyManager('firstSelect', 'firstText', 'wipe', '2');
         </script>
     </body>
 </html>

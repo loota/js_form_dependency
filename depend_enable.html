@@ -10,8 +10,7 @@
         secondText<input id="secondText" type="text" disabled="disabled" class="text_class" />
         <script>
             // First text input, when given value, will enable second text input.
-            var dep = new DependencyManager();
-            dep.createDependency($('firstText'), $('secondText'), 'enable');
+            var dep = new DependencyManager($('firstText'), $('secondText'), 'enable');
         </script>
     </body>
 </html>

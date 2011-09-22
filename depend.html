@@ -13,12 +13,10 @@
         secondCB<input id="secondCB" type="checkbox" value="secondCB" class="hide_class" />
         <script>
             // First text input, when given value, will disable third text input.
-            var dep = new DependencyManager();
-            dep.createDependency($('firstText'), $('thirdText'));
+            var dep = new DependencyManager($('firstText'), $('thirdText'));
 
             // All inputs with class "text_class", given value, will hide all elements with the class "hide_class"
-            var depTextClassToHideClass = new DependencyManager();
-            depTextClassToHideClass.createDependency(document.getElements('.text_class'), document.getElements('.hide_class'), 'hide');
+            var depTextClassToHideClass = new DependencyManager(document.getElements('.text_class'), document.getElements('.hide_class'), 'hide');
         </script>
     </body>
 </html>

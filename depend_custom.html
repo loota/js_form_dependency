@@ -17,10 +17,9 @@
         <script>
             // First select, when given value "2", will log a string to console,
             // and logs another string one when the select is given other value.
-            var depSelectToText = new DependencyManager();
-            depSelectToText.createDependency(
-                firstSelect,
-                firstText,
+            var depSelectToText = new DependencyManager(
+                'firstSelect',
+                'firstText',
                 {
                     'affect': function(slave) {
                         slave._field.set('value', 'choose foo or baz to change back'); 

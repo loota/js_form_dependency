@@ -13,13 +13,11 @@
         <script>
             // Have the first text input, given value, disable and unset the
             // value of the first checkbox.
-            var depTextToCheckbox = new DependencyManager();
-            depTextToCheckbox.createDependency(firstText, firstCB, 'wipe');
+            var depTextToCheckbox = new DependencyManager('firstText', 'firstCB', 'wipe');
 
             // Have the first text input, given value, disable the second
             // checkbox.
-            var depTextToCheckbox2 = new DependencyManager();
-            depTextToCheckbox2.createDependency(firstText, secondCB);
+            var depTextToCheckbox2 = new DependencyManager('firstText', 'secondCB');
         </script>
     </body>
 </html>

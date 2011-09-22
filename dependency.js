@@ -2,6 +2,9 @@
  * License: MIT-style license
  */
 var DependencyManager = new Class({
+  initialize: function(master, slave, effect, trigger) {
+    this.createDependency(master, slave, effect, trigger);
+  },
   setMasters: function(masters) {
     this._masters = masters;
   },

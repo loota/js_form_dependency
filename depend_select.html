@@ -16,8 +16,7 @@
         </select>
         <script>
             // First text input, when given value, will wipe the select input
-            var depTextToSelect = new DependencyManager();
-            depTextToSelect.createDependency(firstText, firstSelect, 'wipe');
+            var depTextToSelect = new DependencyManager('firstText', 'firstSelect', 'wipe');
         </script>
     </body>
 </html>

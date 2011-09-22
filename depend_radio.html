@@ -14,8 +14,7 @@
         <script>
             // First text input, when given value corresponding to the total
             // number of radio inputs in the document, will enable the second radio input.
-            var dep = new DependencyManager();
-            dep.createDependency('firstText', 'secondRadio', 'enable',
+            var dep = new DependencyManager('firstText', 'secondRadio', 'enable',
                 function(master) {
                     return master.getValue() === $('triggerText').get('value');
                 });
