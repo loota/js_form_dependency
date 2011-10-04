@@ -1,6 +1,12 @@
+
 Manages dependencies between HTML form elements such as disabling, enabling and hiding an input after
 another input has been assigned some value. Custom effects can be configured via
 function callbacks.
+
+Installation
+--------------------
+Include the script dependency.js and the MooTools JavaScript library in your
+webpage.
 
 Detailed description
 --------------------
