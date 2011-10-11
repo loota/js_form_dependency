@@ -18,5 +18,12 @@
             // All inputs with class "text_class", given value, will hide all elements with the class "hide_class"
             var depTextClassToHideClass = new DependencyManager(document.getElements('.text_class'), document.getElements('.hide_class'), 'hide');
         </script>
+        <input id="severalOne" type="text" class="several" value="" />
+        <input id="severalTwo" type="text" class="several" value="" />
+        <input id="severalThree" type="text" class="several" value="" />
+        <input id="slaveOfMany" type="text" value="" /> 
+        <script>
+            var dep = new DependencyManager($$('.several'), 'slaveOfMany');
+        </script>
     </body>
 </html>

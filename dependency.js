@@ -200,21 +200,27 @@ var DependencyManager = new Class({
             }
         }
         var effectShouldHappen = false;
-        effectShouldHappen = this._shouldEffectHappen(triggerValue, currentMaster);
+        //effectShouldHappen = this._shouldEffectHappen(triggerValue, currentMaster);
         var that = this;
-        if (effectShouldHappen) {
-            this.affectSlaves(wrappedSlaves);
-        } else {
+        //if (effectShouldHappen) {
+            //this.affectSlaves(wrappedSlaves);
+            //return;
+        //} else {
+            var shouldReturn = false;
             this.getMasters().each(function (otherMaster) {
                 effectShouldHappen = that._shouldEffectHappen(triggerValue, otherMaster);
                 if (effectShouldHappen) {
-                    this.affectSlaves(wrappedSlaves);
+                    that.affectSlaves(wrappedSlaves);
+                    shouldReturn = true;
                 }
             });
-        }
+            if (shouldReturn) {
+                return;
+            }
+        //}
         if (triggerValue && triggerValue !== currentMaster.getValue() ||
             (!triggerValue && !effectShouldHappen)) {
-            this.unaffectSlaves(wrappedSlaves);
+            that.unaffectSlaves(wrappedSlaves);
         }
     }
 });
