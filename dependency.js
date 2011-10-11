@@ -200,24 +200,18 @@ var DependencyManager = new Class({
             }
         }
         var effectShouldHappen = false;
-        //effectShouldHappen = this._shouldEffectHappen(triggerValue, currentMaster);
         var that = this;
-        //if (effectShouldHappen) {
-            //this.affectSlaves(wrappedSlaves);
-            //return;
-        //} else {
-            var shouldReturn = false;
-            this.getMasters().each(function (otherMaster) {
-                effectShouldHappen = that._shouldEffectHappen(triggerValue, otherMaster);
-                if (effectShouldHappen) {
-                    that.affectSlaves(wrappedSlaves);
-                    shouldReturn = true;
-                }
-            });
-            if (shouldReturn) {
-                return;
+        var shouldReturn = false;
+        this.getMasters().each(function (otherMaster) {
+            effectShouldHappen = that._shouldEffectHappen(triggerValue, otherMaster);
+            if (effectShouldHappen) {
+                that.affectSlaves(wrappedSlaves);
+                shouldReturn = true;
             }
-        //}
+        });
+        if (shouldReturn) {
+            return;
+        }
         if (triggerValue && triggerValue !== currentMaster.getValue() ||
             (!triggerValue && !effectShouldHappen)) {
             that.unaffectSlaves(wrappedSlaves);
