@@ -1,15 +1,76 @@
 /**
  * License: MIT-style license
  */
+
 var DependencyManager = new Class({
-  initialize: function(master, slave, effect, trigger) {
-    this.createDependency(master, slave, effect, trigger);
+
+ /**
+  * @param array|string|mootools element master  the element or elements of which slave or slaves depend on
+  * @param array|string|mootools element slave  the element or elements which depend on the master or masters
+  * @param string|object  effect  the effect which happens to the slave element
+  *  or elements. One of hide, disable, enable, wipe. If given an object, there
+  *  must be two members: 'affect' and 'unaffect'.
+  *  'affect' must contain a function which is run when the
+  *  master has the preferred value and should contain functionality for
+  *  defining what happens to the slave. 
+  *  The 'unaffect' is run when the master gains other than the preferred value
+  *  and defines what happens to slaves in that case.
+  * @param string|function  triggerValue  the value that the master or masters must to have in
+  *  order to affect the slave or slaves. If given a function, the function
+  *  receives an object representing the master and the function's
+  *  return value decides if the slave or slaves will be affected.
+  */
+  initialize: function(masters, slaves, effect, trigger) {
+    this._initMasters(masters);
+    this._initSlaves(slaves);
+    this.setEffect(effect);
+    this.triggerValue = trigger;
+    this._addEvents();
   },
+  /**
+   * @param string|DOM element masters
+   */
+  _initMasters: function(masters) {
+    if (typeOf(masters) === 'string') {
+        masters = $(masters);
+    }
+    if (typeOf(masters) !== 'array' && typeOf(masters) !== 'elements') {
+      var masters = [masters];
+    }
+
+    var wrappedMasters = [];
+    var that = this;
+    masters.each(function (currentMaster) {
+      var wrappedMaster = that._getWrappedElement(currentMaster);
+      wrappedMasters.push(wrappedMaster);
+    });
+    this.setMasters(wrappedMasters);
+  },
+
+  /**
+   * @param string|DOM element slave
+   */
+  _initSlaves: function(slaves) {
+    if (typeOf(slaves) === 'string') {
+        slaves = $(slaves);
+    }
+    if (typeOf(slaves) !== 'array' && typeOf(slaves) !== 'elements') {
+      slaves = [slaves];
+    }
+    this._slaves = slaves;
+  },
+
+  /**
+   * @param array masters array of HtmlWrapper
+   */
   setMasters: function(masters) {
     this._masters = masters;
   },
   getMasters: function() {
     return this._masters;
+  },
+  getSlaves: function() {
+    return this._slaves;
   },
   setEffect: function(effect) {
     this._effect = effect;
@@ -17,7 +78,10 @@ var DependencyManager = new Class({
   getEffect: function() {
     return this._effect;
   },
-  // @param DOM element element
+
+  /**
+   * @param DOM element element
+   */
   _getWrappedElement: function(element) {
     if (element.type === 'text') {
       var wrappedElement = new TextInput();
@@ -36,7 +100,10 @@ var DependencyManager = new Class({
     }
     return wrappedElement;
   },
-  // @param array slaves of DOM elements
+
+  /**
+   * @param array slaves of DOM elements
+   */
   _getEnhancedSlaves: function(slaves) {
     var wrappedSlaves = [];
     var parentFunction = this;
@@ -46,24 +113,29 @@ var DependencyManager = new Class({
     });
     return wrappedSlaves;
   },
-  // @param array slaves of enhanced slave elements
+
+  /**
+   * @param array slaves enhanced slave elements
+   */
   affectSlaves: function(slaves) {
     var parentFunction = this;
     slaves.each(function (currentSlave) {
       if (parentFunction.getEffect() === 'wipe') {
-          currentSlave.wipe();
+        currentSlave.wipe();
       } else if (parentFunction.getEffect() === 'hide') {
         currentSlave.hide();
       } else if (parentFunction.getEffect() === 'enable') {
         currentSlave.enable();
       } else if (typeOf(parentFunction.getEffect()) === 'object') {
-          parentFunction.getEffect()['affect'](currentSlave);
+        parentFunction.getEffect()['affect'](currentSlave);
       } else {
         currentSlave.disable();
       }
     });
   },
-  // @param array slaves of enhanced slave elements
+  /**
+   * @param array wrappedSlaves enhanced slave elements
+   */
   unaffectSlaves: function(wrappedSlaves) {
     parentFunction = this;
     wrappedSlaves.each(function (currentSlave) {
@@ -80,65 +152,25 @@ var DependencyManager = new Class({
       }
     });
   },
-  // @param array|string|mootools element  master  the element or elements of which slave or slaves depend on
-  // @param array|string|mootools element  slave  the element or elements which depend on the master or masters
-  // @param string|object  effect  the effect which happens to the slave element
-  // or elements. One of hide, disable, enable, wipe. If given an object, there
-  // must be two members: 'affect' and 'unaffect'.
-  // 'affect' must contain a function which is run when the
-  // master has the preferred value and should contain functionality for
-  // defining what happens to the slave. 
-  // The 'unaffect' is run when the master gains other than the preferred value
-  // and defines what happens to slaves in that case.
-  // @param string|function  triggerValue  the value that the master or masters must to have in
-  // order to affect the slave or slaves. If given a function, the function
-  // receives an object representing the master and the function's
-  // return value decides if the slave or slaves will be affected.
-  createDependency: function(master, slave, effect, triggerValue) {
 
-    if (typeOf(master) === 'string') {
-        master = $(master);
-    }
-    if (typeOf(slave) === 'string') {
-        slave = $(slave);
-    }
-    this.setEffect(effect);
-    parentFunction = this;
-    if (typeOf(master) === 'array' || typeOf(master) === 'elements') {
-      masters = master;
-    } else {
-      masters = [master];
-    }
-
-    var wrappedMasters = [];
-    masters.each(function (currentMaster) {
-      var wrappedMaster = parentFunction._getWrappedElement(currentMaster);
-      wrappedMasters.push(wrappedMaster);
-    });
-    this.setMasters(wrappedMasters);
+  _addEvents: function () {
     var parentFunction = this;
     this.getMasters().each(function (currentMaster) {
       currentMaster.getField().addEvent('keyup', function() {
-          parentFunction.checkEffectToSlaves(currentMaster, slave, triggerValue, parentFunction);
+          parentFunction._checkEffectToSlaves(currentMaster, parentFunction.getSlaves());
       });
       currentMaster.getField().addEvent('change', function() {
-          parentFunction.checkEffectToSlaves(currentMaster, slave, triggerValue, parentFunction);
+          parentFunction._checkEffectToSlaves(currentMaster, parentFunction.getSlaves());
       });
     });
   },
   
-  // @param array|string|mootools element  master  the element or elements of which slave or slaves depend on
-  // @param array|string|mootools element  slave  the element or elements which depend on the master or masters
-  // @param string|function  triggerValue  the value that the master or masters
-  // must have in order to affect the slave or slaves. If a function is given,
-  // it takes as a parameter the master object and returns boolean, true if the
-  // slave or slaves will be affected. @see createDependency
-  checkEffectToSlaves: function (currentMaster, slave, triggerValue, parentFunction){
-    if (typeOf(slave) === 'array' || typeOf(slave) === 'elements') {
-      slaves = slave;
-    } else {
-      slaves = [slave];
-    }
+  /** 
+   * @param array|string|mootools element  master  the element or elements of which slave or slaves depend on
+   * @param array|string|mootools element  slave  the element or elements which depend on the master or masters
+   */
+  _checkEffectToSlaves: function (currentMaster, slaves) {
+    triggerValue = this.triggerValue;
     if (typeOf(triggerValue) === 'function') {
         var result = triggerValue(currentMaster);
         if (result) {
