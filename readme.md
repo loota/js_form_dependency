@@ -10,9 +10,13 @@ Detailed description
 --------------------
 Some elements, called slaves in this document, are defined to depend on other elements, called masters in this document.
 
-At minimum, the dependency manager takes a master and a slave, and adds an event to the onchange and onkeyup events on the master. In this event the dependency manager checks if the value of the master matches the triggering value and if it does, it initiates an effect on the slaves.
+Triggering value is by default any value other than empty string in the HTML input element.
 
-These are the predefined effects: hide, disable, enable and wipe (set the element as disabled and remove the value, or if impossible, set a default value) 
+At minimum, the dependency manager takes a master and a slave, and adds an event to the onchange and onkeyup events on the master. In these events the dependency manager checks if the value of the master matches the triggering value and if it does, it initiates an effect on the slaves.
+
+Tha masters and slaves can be passed as arrays and in that case, any master having the triggering value will cause the effect upon all the slaves.
+
+The effect can be passed as a string, which should be one of the following: hide, disable, enable or wipe. Wipe sets the element as disabled and removes the value, or if removing is impossible as with select lists, set a default value. 
 
 A custom effect can be supplied in an object, which must contain two functions: one for defining the effect when master is assigned the defined value, and one for defining what happens when the master no longer has the defined value.
 
