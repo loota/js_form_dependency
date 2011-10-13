@@ -9,6 +9,7 @@ Include the script dependency.js and the MooTools JavaScript library in your web
 Quick start
 -----------
 See the file demo/quick-start.html for examples in action.
+
 Synopsis:
 <pre>
 new DependencyManager(MASTER, SLAVE [, EFFECT] [, TRIGGER]);
