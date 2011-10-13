@@ -9,7 +9,9 @@ Include the script dependency.js and the MooTools JavaScript library in your web
 Quick start
 -----------
 Synopsis:
-new DependencyManager(MASTER, SLAVE[, EFFECT][, TRIGGER]);
+<pre>
+new DependencyManager(MASTER, SLAVE [, EFFECT] [, TRIGGER]);
+</pre>
 
 Disable element with id 'two' when element with id 'one' has any value
 <pre>
