@@ -11,37 +11,40 @@ Quick start
 Synopsis:
 new DependencyManager(MASTER, SLAVE[, EFFECT][, TRIGGER]);
 
-Disable element with id 'two' when element with id 'one' has value
+Disable element with id 'two' when element with id 'one' has any value
 new DependencyManager('one', 'two');
 
-Hide element with id 'two' when element with id 'one' has value
-new DependencyManager('one', 'two', 'hide');
+Hide element with id 'four' when element with id 'three' has any value
+new DependencyManager('three', 'four', 'hide');
 
-Disable element with id 'two' when element with id 'one' has value '42'.
-new DependencyManager('one', 'two', 'disable', '42');
+Disable element with id 'six' when element with id 'five' has value '42'.
+new DependencyManager('five', 'six', 'disable', '42');
 
-Make sure the value of element with id 'two' is 'affected' when element with id
-'one' has value, and the value is 'unaffected' when element with id 'one' has no
-value.
-
-new DependencyManager('one', 'two', 'disable', 
-    {
+Make sure the value of element with id 'eight' is the string 'affected' when element with id
+'seven' has any value, and the value is 'unaffected' when element with id 'one' has no
+value.      
+<pre>
+new DependencyManager('seven', 'eight', 
+    { 
         affect: function(slave) {
-            slave._field.set('value',  'affected');
-        } 
+            slave._field.set('value', 'affected');
+        },
         unaffect: function(slave) {
-            slave._field.set('value',  'unaffected');
-        } 
+            slave._field.set('value', 'unaffected');
+        }
     }
 );
+</pre>
 
-Disable element with id 'two' when element with id 'one' has a value divisible
-by 10.
-new DependencyManager('one', 'two', 'disable',
+Disable element with id 'ten' when element with id 'nine' has a
+value not zero and divisible by ten.
+<pre>
+new DependencyManager('nine', 'ten', 'disable',
     function (master) {
         return master.getValue() > 0 && master.getValue() % 10 === 0;
     }
 );
+</pre>
 
 Detailed description
 --------------------
