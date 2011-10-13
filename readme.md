@@ -12,13 +12,19 @@ Synopsis:
 new DependencyManager(MASTER, SLAVE[, EFFECT][, TRIGGER]);
 
 Disable element with id 'two' when element with id 'one' has any value
+<pre>
 new DependencyManager('one', 'two');
+</pre>
 
 Hide element with id 'four' when element with id 'three' has any value
+<pre>
 new DependencyManager('three', 'four', 'hide');
+</pre>
 
 Disable element with id 'six' when element with id 'five' has value '42'.
+<pre>
 new DependencyManager('five', 'six', 'disable', '42');
+</pre>
 
 Make sure the value of element with id 'eight' is the string 'affected' when element with id
 'seven' has any value, and the value is 'unaffected' when element with id 'one' has no
