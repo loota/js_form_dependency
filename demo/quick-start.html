@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <script src="../mootools.js">
+        </script>
+        <script src="../dependency.js">
+        </script>
+        <style type="text/css">
+            div {
+                padding: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <span>
+                Disable element with id 'two' when element with id 'one' has any value
+                new DependencyManager('one', 'two');
+            </span>
+            <br/>
+            <label for="one">One</label>
+            <input id="one" type="text" value="" />
+            <br />
+            <label for="two">Two</label>
+            <input id="two" type="text" value="" />
+            <br />
+            <script>
+                new DependencyManager('one', 'two');
+            </script>
+        </div>
+
+        <div>
+            Hide element with id 'four' when element with id 'three' has any value
+            <br />
+            <label for="three">Three</label>
+            <input id="three" type="text" value="" />
+            <br />
+            <label for="four">Four</label>
+            <input id="four" type="text" value="" />
+            <br />
+            <script>
+                new DependencyManager('three', 'four', 'hide');
+            </script>
+        </div>
+
+        <div>
+            Disable element with id 'six' when element with id 'five' has value '42'.
+            <br />
+            <label for="five">Five</label>
+            <input id="five" type="text" value="" />
+            <br />
+            <label for="six">Six</label>
+            <input id="six" type="text" value="" />
+            <br />
+            <script>
+                new DependencyManager('five', 'six', 'disable', '42');
+            </script>
+        </div>
+
+        <div>
+            Make sure the value of element with id 'eight' is the string 'affected' when element with id
+            'seven' has any value, and the value is 'unaffected' when element with id 'one' has no
+            value.
+            <br />
+            <label for="seven">Seven</label>
+            <input id="seven" type="text" value="" />
+            <br />
+            <label for="eight">Eight</label>
+            <input id="eight" type="text" value="" />
+            <br />
+            <script>
+                new DependencyManager('seven', 'eight', 
+                    { 
+                        affect: function(slave) {
+                            slave._field.set('value', 'affected');
+                        },
+                        unaffect: function(slave) {
+                            slave._field.set('value', 'unaffected');
+                        }
+                    });
+            </script>
+        </div>
+        <div>
+            Disable element with id 'ten' when element with id 'nine' has a
+            value not zero and divisible by ten.
+            <br />
+            <label for="nine">Nine</label>
+            <input id="nine" type="text" value="" />
+            <br />
+            <label for="ten">Ten</label>
+            <input id="ten" type="text" value="" />
+            <br />
+            <script>
+                new DependencyManager('nine', 'ten', 'disable',
+                    function (master) {
+                        return master.getValue() > 0 && master.getValue() % 10 === 0;
+                    }
+                );
+            </script>
+        </div>
+    </body>
+</html>
