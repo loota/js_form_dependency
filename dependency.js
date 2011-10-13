@@ -173,13 +173,19 @@ var DependencyManager = new Class({
     },
     /**
      * @param mixed triggerValue
-     * @param HtmlWrapper currentMaster
+     * @param HtmlWrapper master
      */
-    _shouldEffectHappen: function (triggerValue, currentMaster) {
-        if (triggerValue === currentMaster.getValue()) {
+    _shouldEffectHappen: function (triggerValue, master) {
+        if (typeOf(triggerValue) === 'function') {
+            var result = triggerValue(master);
+            if (result) {
+                return true;
+            }
+        }
+        if (triggerValue === master.getValue()) {
             return true;
         } else if (!triggerValue) {
-            if (currentMaster.hasValue()) {
+            if (master.hasValue()) {
                 return true;
             }
         }
@@ -192,18 +198,11 @@ var DependencyManager = new Class({
     _checkEffectToSlaves: function (currentMaster, slaves) {
         triggerValue = this.triggerValue;
         wrappedSlaves = this._getEnhancedSlaves(slaves);
-        if (typeOf(triggerValue) === 'function') {
-            var result = triggerValue(currentMaster);
-            if (result) {
-                this.affectSlaves(wrappedSlaves);
-                return;
-            }
-        }
         var effectShouldHappen = false;
         var that = this;
         var shouldReturn = false;
-        this.getMasters().each(function (otherMaster) {
-            effectShouldHappen = that._shouldEffectHappen(triggerValue, otherMaster);
+        this.getMasters().each(function (master) {
+            effectShouldHappen = that._shouldEffectHappen(triggerValue, master);
             if (effectShouldHappen) {
                 that.affectSlaves(wrappedSlaves);
                 shouldReturn = true;

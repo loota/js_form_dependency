@@ -6,26 +6,25 @@
         </script>
     </head>
     <body>
-        firstSelect
         <select id="firstSelect">
-            <option value="1">foo</option>
-            <option value="2">bar</option>
-            <option value="3">baz</option>
+            <option value="1">One</option>
+            <option value="2">Two</option>
+            <option value="3">Three</option>
         </select>
-        firstText
-        <input id="firstText" type="text" value="will change if baz selected" />
+        <input id="masterText" type="text" value="" />
+        <input id="firstText" type="text" value="will change if there's value three" />
         <script>
             // First select, when given value "3", will change the text of input
             // field 'firstText' and changes it back string when the select is given other value.
             var depSelectToText = new DependencyManager(
-                'firstSelect',
+                $$('#firstSelect').combine($$('#masterText')),
                 'firstText',
                 {
                     'affect': function(slave) {
-                        slave._field.set('value', 'choose foo or bar to change back'); 
+                        slave._field.set('value', 'choose other value than three to change back'); 
                     },
                     'unaffect': function(slave) {
-                        slave._field.set('value', 'will change if baz selected'); 
+                        slave._field.set('value', 'will change if there\'s value three'); 
                     }
                 },
                 function(master) {
