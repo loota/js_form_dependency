@@ -1,4 +1,3 @@
-
 Manages dependencies between HTML form elements such as disabling, enabling and hiding an input after
 another input has been assigned some value. Custom effects can be configured via
 function callbacks.
@@ -7,6 +6,43 @@ Installation
 --------------------
 Include the script dependency.js and the MooTools JavaScript library in your
 webpage.
+
+Quick start
+-----------
+Synopsis:
+new DependencyManager(MASTER, SLAVE[, EFFECT][, TRIGGER]);
+
+Disable element with id 'two' when element with id 'one' has value
+new DependencyManager('one', 'two');
+
+Hide element with id 'two' when element with id 'one' has value
+new DependencyManager('one', 'two', 'hide');
+
+Disable element with id 'two' when element with id 'one' has value '42'.
+new DependencyManager('one', 'two', 'disable', '42');
+
+Make sure the value of element with id 'two' is 'affected' when element with id
+'one' has value, and the value is 'unaffected' when element with id 'one' has no
+value.
+
+new DependencyManager('one', 'two', 'disable', 
+    {
+        affect: function(slave) {
+            slave._field.set('value',  'affected');
+        } 
+        unaffect: function(slave) {
+            slave._field.set('value',  'unaffected');
+        } 
+    }
+);
+
+Disable element with id 'two' when element with id 'one' has a value divisible
+by 10.
+new DependencyManager('one', 'two', 'disable',
+    function (master) {
+        return master.getValue() > 0 && master.getValue() % 10 === 0;
+    }
+);
 
 Detailed description
 --------------------
